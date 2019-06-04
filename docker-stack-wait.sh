@@ -12,7 +12,7 @@ opt_t=3600
 start_epoc=$(date +%s)
 
 usage() {
-  echo "$(basename $0) [opts] stack_name"
+  echo "$(basename $0) [opts] SERVICE..."
   echo "  -h:     this help message"
   echo "  -r:     treat a rollback as successful (by default, a rollback indicates failure)"
   echo "  -s sec: frequency to poll service state (default $opt_s sec)"
@@ -53,19 +53,19 @@ while getopts 'hrs:t:' opt; do
 done
 shift $(expr $OPTIND - 1)
 
-if [ $# -ne 1 -o "$opt_h" = "1" -o "$opt_s" -le "0" ]; then
+if [ $# -le 1 -o "$opt_h" = "1" -o "$opt_s" -le "0" ]; then
   usage
 fi
 
-stack_name=$1
+services=$*
 
 # 0 = running, 1 = success, 2 = error
 stack_done=0
 while [ "$stack_done" != "1" ]; do
   stack_done=1
-  for service_id in $(docker stack services -q "${stack_name}"); do
+  for service in $services; do
+    service_id=$(docker service inspect --format '{{.ID}}' "$service")
     service_done=1
-    service=$(docker service inspect --format '{{.Spec.Name}}' "$service_id")
 
     # hardcode a "new" state when UpdateStatus is not defined
     state=$(docker service inspect -f '{{if .UpdateStatus}}{{.UpdateStatus.State}}{{else}}new{{end}}' "$service_id")
@@ -126,4 +126,3 @@ while [ "$stack_done" != "1" ]; do
     sleep "${opt_s}"
   fi
 done
- 
