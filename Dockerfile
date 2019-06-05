@@ -1,5 +1,5 @@
 FROM docker
 
-COPY docker-stack-wait.sh /
+COPY docker-swarm-wait.sh /
 
-ENTRYPOINT [ "/docker-stack-wait.sh" ]
+ENTRYPOINT [ "/docker-swarm-wait.sh" ]
