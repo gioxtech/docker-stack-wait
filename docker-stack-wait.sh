@@ -19,6 +19,7 @@ usage() {
   echo "  -t sec: timeout to stop waiting"
   [ "$opt_h" = "1" ] && exit 0 || exit 1
 }
+
 check_timeout() {
   # timeout when a timeout is defined and we will exceed the timeout after the
   # next sleep completes
@@ -31,6 +32,7 @@ check_timeout() {
     fi
   fi
 }
+
 service_state() {
   # output the state when it changes from the last state for the service
   service=$1
@@ -53,7 +55,7 @@ while getopts 'hrs:t:' opt; do
 done
 shift $(expr $OPTIND - 1)
 
-if [ $# -le 1 -o "$opt_h" = "1" -o "$opt_s" -le "0" ]; then
+if [ $# -lt 1 -o "$opt_h" = "1" -o "$opt_s" -le "0" ]; then
   usage
 fi
 
